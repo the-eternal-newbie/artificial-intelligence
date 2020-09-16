@@ -1,6 +1,7 @@
 import json
 import numpy as np
 from os import path
+from perceptron import Perceptron
 import tkinter as tk
 from tkinter import messagebox
 from matplotlib.figure import Figure
@@ -11,9 +12,11 @@ from matplotlib.backend_bases import key_press_handler
 
 root = tk.Tk()
 root.wm_title("HW1 - Perceptron")
-file = open('perceptron/test.json', 'w')
+file = open('test.json', 'w')
 file.write('[]')
 file.close()
+global quit_button
+global train_button
 
 
 class Layout(object):
@@ -39,26 +42,34 @@ class Layout(object):
         self.canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
         self.canvas.mpl_connect("button_press_event", self.on_click)
 
+        toolbar = NavigationToolbar2Tk(self.canvas, root)
+        toolbar.update()
+        self.canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+
     # Left click -> Class with 0s
     # Right click -> Class with 1s
-    # @staticmethod
     def on_click(self, event):
         ix, iy = event.xdata, event.ydata
-        point = {'coord': None, 'expected': None}
-        color = 'orange'
-        point['expected'] = 0
-        if(event.button == 3):
-            point['expected'] = 1
-            color = 'purple'
-        point['coord'] = [-1, ix, iy]
-        self.ax.scatter(point['coord'][1], point['coord'][2], color=color)
-        self.canvas.draw()  # Refreshes the canvas
-        # Open the file, then read it to append new points in active session
-        with open('perceptron/test.json', 'r+') as file:
-            data = json.load(file)
-            data.append(point)
-            file.seek(0)
-            json.dump(data, file)
+        if(ix != None):
+            point = {'coord': None, 'expected': None}
+            color = 'orange'
+            point['expected'] = 0
+            if(event.button == 3):
+                point['expected'] = 1
+                color = 'purple'
+            # The round operation on the coords is to prevent a slow convergence of the algorithm,
+            # the plot detects a very precise coord of almost 10 decimal places and it is harder for
+            # the algorithm to process those values
+            point['coord'] = [-1, round(ix, 2), round(iy, 2)]
+            self.ax.scatter(point['coord'][1], point['coord'][2], color=color)
+            self.canvas.draw()  # Refreshes the canvas
+            # Open the file, then read it to append new points in active session
+            with open('test.json', 'r+') as file:
+                data = json.load(file)
+                data.append(point)
+                file.seek(0)
+                json.dump(data, file)
+
 
 def _quit():
     root.quit()     # stops mainloop
@@ -67,11 +78,26 @@ def _quit():
 
 
 # Starts the perceptron algorithm
-def _train(eta_field, epoch_field):
+def _train(eta_field, epoch_field, w0_field, w1_field, w2_field):
     try:
         eta = float(eta_field.get())
         epoch_limit = int(epoch_field.get())
-        window = tk.Toplevel(root)
+        weights = [float(w0_field.get()), float(
+            w1_field.get()), float(w2_field.get())]
+
+        train_button.config(state='disabled')
+        quit_button.config(state='disabled')
+
+        with open('test.json', 'r') as json_file:
+            data = json.load(json_file)
+        trainer = Perceptron(data, eta, epoch_limit, weights)
+        trainer.process()
+        print(trainer.weights)
+
+        x = np.linspace(-5, 5, 100)
+        layout.ax.plot(x, trainer.linear_function(x))
+        layout.canvas.draw()
+        # window = tk.Toplevel(root)
     except ValueError as error:
         messagebox.showerror(
             error, 'Input values must be float (for eta) and integer (for epoch limit)!')
@@ -80,7 +106,7 @@ def _train(eta_field, epoch_field):
 # TODO: Add buttons, labels and number fields
 if __name__ == "__main__":
     layout = Layout(root, 'Perceptron', 5)
-    
+
     eta_label = tk.Label(root, text='η value:', width=10, anchor=tk.S)
     eta_field = tk.Spinbox(master=root, from_=0, to=5, increment=.1, width=5)
     eta_field.place(x=85, y=660)
@@ -93,9 +119,9 @@ if __name__ == "__main__":
     epoch_label.place(x=1, y=680)
 
     weights_label = tk.Label(root, text='ω0: \t ω1: \t   ω2: ')
-    w0_field = tk.Spinbox(master=root, from_=0, to=10, increment=.1, width=3)
-    w1_field = tk.Spinbox(master=root, from_=0, to=10, increment=.1, width=3)
-    w2_field = tk.Spinbox(master=root, from_=0, to=10, increment=.1, width=3)
+    w0_field = tk.Spinbox(master=root, from_=1, to=10, increment=.1, width=3)
+    w1_field = tk.Spinbox(master=root, from_=1, to=10, increment=.1, width=3)
+    w2_field = tk.Spinbox(master=root, from_=1, to=10, increment=.1, width=3)
     weights_label.place(x=1, y=705)
     w0_field.place(x=28, y=705)
     w1_field.place(x=98, y=705)
@@ -105,7 +131,7 @@ if __name__ == "__main__":
     quit_button.pack(side=tk.RIGHT)
 
     train_button = tk.Button(
-        master=root, text='Start Trainning', command=lambda: _train(eta_field, epoch_field))
+        master=root, text='Start Trainning', command=lambda: _train(eta_field, epoch_field, w0_field, w1_field, w2_field))
     train_button.pack(side=tk.RIGHT)
 
     tk.mainloop()
