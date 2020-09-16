@@ -13,8 +13,10 @@ from matplotlib.backend_bases import key_press_handler
 
 root = tk.Tk()
 root.wm_title("HW1 - Perceptron")
-file = open('test.json', 'w')
-file.write('[]')
+file = open('test.json', 'w')   # Everytime the program is executed, 
+                                # the a new file is created, replacing the previous one
+                                # (to erase all previous data)
+file.write('[]') # Writes a json list element
 file.close()
 global quit_button
 global train_button
@@ -86,7 +88,7 @@ def _initialize_weights(w0_field, w1_field, w2_field):
     try:
         weights = [float(w0_field.get()), float(
             w1_field.get()), float(w2_field.get())]
-        
+
         x = np.linspace(-5, 5, 100)
         y = (weights[0] - (weights[1]*x))/weights[2]
         layout.ax.plot(x, y)
@@ -95,9 +97,8 @@ def _initialize_weights(w0_field, w1_field, w2_field):
         messagebox.showerror(
             error, 'Input values must be float (for eta) and integer (for epoch limit)!')
 
+
 # Starts the perceptron algorithm
-
-
 def _train(eta_field, epoch_field):
     try:
         eta = float(eta_field.get())
@@ -107,7 +108,6 @@ def _train(eta_field, epoch_field):
             data = json.load(json_file)
         trainer = Perceptron(data, eta, epoch_limit, weights)
         trainer.process()
-        # print(trainer.weights)
 
         # TODO: Add animation to line
         x = np.linspace(-5, 5, 100)
@@ -125,17 +125,20 @@ def _train(eta_field, epoch_field):
 if __name__ == "__main__":
     layout = Layout(root, 'Perceptron', 5)
 
+    # Creates the eta label and field
     eta_label = tk.Label(root, text='η value:', width=10, anchor=tk.S)
     eta_field = tk.Spinbox(master=root, from_=0, to=5, increment=.1, width=5)
     eta_field.place(x=85, y=660)
     eta_label.place(x=1, y=660)
 
+    # Creates the epoch limit label and field
     epoch_label = tk.Label(root, text='Epoch limit:', width=10)
     epoch_field = tk.Spinbox(master=root, from_=0,
                              to=4000, increment=100, width=5)
     epoch_field.place(x=85, y=680)
     epoch_label.place(x=1, y=680)
 
+    # Creates the weights label and each field for the three weights
     weights_label = tk.Label(root, text='ω0: \t ω1: \t   ω2: ')
     w0_field = tk.Spinbox(master=root, from_=.1, to=10, increment=.1, width=3)
     w1_field = tk.Spinbox(master=root, from_=.1, to=10, increment=.1, width=3)
@@ -144,8 +147,9 @@ if __name__ == "__main__":
     w0_field.place(x=28, y=705)
     w1_field.place(x=98, y=705)
     w2_field.place(x=168, y=705)
-    weights = []
+    weights = []    # declares the weights variable in the global scope of the program
 
+    # Creates three buttons (to initialize the weight vector, to start the perceptron's training and to quit the program)
     quit_button = tk.Button(master=root, text='Quit', command=_quit)
     quit_button.pack(side=tk.RIGHT)
 
@@ -157,5 +161,6 @@ if __name__ == "__main__":
         master=root, text='Start Trainning', command=lambda: _train(eta_field, epoch_field))
     train_button.pack(side=tk.RIGHT)
 
+    # Disables the train_button until the weight_button is pressed
     train_button.config(state='disabled')
     tk.mainloop()
