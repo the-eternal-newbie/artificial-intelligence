@@ -1,7 +1,8 @@
 import json
 import numpy as np
-import tkinter as tk
 from os import path
+import tkinter as tk
+from tkinter import messagebox
 from matplotlib.figure import Figure
 from matplotlib.ticker import MaxNLocator
 from matplotlib.backends.backend_tkagg import (
@@ -9,18 +10,30 @@ from matplotlib.backends.backend_tkagg import (
 from matplotlib.backend_bases import key_press_handler
 
 root = tk.Tk()
-root.wm_title("Embedding in Tk")
+root.wm_title("HW1 - Perceptron")
 file = open('perceptron/test.json', 'w')
 file.write('[]')
 file.close()
 
 
 class Layout(object):
-    def __init__(self, root):
+    def __init__(self, root, title, size=5):
         fig = Figure(figsize=(7, 7), dpi=100)
         self.ax = fig.add_subplot(111)
-        self.ax.set(xlim=(0, 1), ylim=(0, 1))  # arbitrary data
+        self.ax.set_title(title)
 
+        # Makes the plot fixed (prevents from resizing)
+        self.ax.set(xlim=(-size, size), ylim=(-size, size))
+        # Adds guide lines
+        self.ax.axhline(y=0, color="black")
+        self.ax.axvline(x=0, color="black")
+        # Draw arrow points
+        self.ax.scatter(0, size-.1, marker='^', color='black')
+        self.ax.scatter(size-.1, 0, marker='>', color='black')
+        self.ax.scatter(0, -size+.1, marker='v', color='black')
+        self.ax.scatter(-size+.1, 0, marker='<', color='black')
+
+        # Connect the plot with the GUI interface
         self.canvas = FigureCanvasTkAgg(fig, master=root)
         self.canvas.draw()
         self.canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
@@ -37,9 +50,9 @@ class Layout(object):
         if(event.button == 3):
             point['expected'] = 1
             color = 'purple'
-        point['coord'] = [ix, iy]
-        self.ax.scatter(point['coord'][0], point['coord'][1], color=color)
-        self.canvas.draw()
+        point['coord'] = [-1, ix, iy]
+        self.ax.scatter(point['coord'][1], point['coord'][2], color=color)
+        self.canvas.draw()  # Refreshes the canvas
         # Open the file, then read it to append new points in active session
         with open('perceptron/test.json', 'r+') as file:
             data = json.load(file)
@@ -47,15 +60,52 @@ class Layout(object):
             file.seek(0)
             json.dump(data, file)
 
-
 def _quit():
     root.quit()     # stops mainloop
     root.destroy()  # this is necessary on Windows to prevent
     # Fatal Python Error: PyEval_RestoreThread: NULL tstate
 
 
+# Starts the perceptron algorithm
+def _train(eta_field, epoch_field):
+    try:
+        eta = float(eta_field.get())
+        epoch_limit = int(epoch_field.get())
+        window = tk.Toplevel(root)
+    except ValueError as error:
+        messagebox.showerror(
+            error, 'Input values must be float (for eta) and integer (for epoch limit)!')
+
+
+# TODO: Add buttons, labels and number fields
 if __name__ == "__main__":
-    layout = Layout(root)
-    button = tk.Button(master=root, text="Quit", command=_quit)
-    button.pack(side=tk.BOTTOM)
+    layout = Layout(root, 'Perceptron', 5)
+    
+    eta_label = tk.Label(root, text='η value:', width=10, anchor=tk.S)
+    eta_field = tk.Spinbox(master=root, from_=0, to=5, increment=.1, width=5)
+    eta_field.place(x=85, y=660)
+    eta_label.place(x=1, y=660)
+
+    epoch_label = tk.Label(root, text='Epoch limit:', width=10)
+    epoch_field = tk.Spinbox(master=root, from_=0,
+                             to=4000, increment=100, width=5)
+    epoch_field.place(x=85, y=680)
+    epoch_label.place(x=1, y=680)
+
+    weights_label = tk.Label(root, text='ω0: \t ω1: \t   ω2: ')
+    w0_field = tk.Spinbox(master=root, from_=0, to=10, increment=.1, width=3)
+    w1_field = tk.Spinbox(master=root, from_=0, to=10, increment=.1, width=3)
+    w2_field = tk.Spinbox(master=root, from_=0, to=10, increment=.1, width=3)
+    weights_label.place(x=1, y=705)
+    w0_field.place(x=28, y=705)
+    w1_field.place(x=98, y=705)
+    w2_field.place(x=168, y=705)
+
+    quit_button = tk.Button(master=root, text='Quit', command=_quit)
+    quit_button.pack(side=tk.RIGHT)
+
+    train_button = tk.Button(
+        master=root, text='Start Trainning', command=lambda: _train(eta_field, epoch_field))
+    train_button.pack(side=tk.RIGHT)
+
     tk.mainloop()
