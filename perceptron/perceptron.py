@@ -20,15 +20,12 @@ class Perceptron(object):
             self.weights = np.array([weights])
         else:
             self.weights = np.random.rand(1, 3)
-        self.slopes = []
+        self.lines = []
 
     def activation(self, X):
         if(np.dot(self.weights, np.array(X)) >= 0):
             return(1)
         return(0)
-
-    def linear_function(self, X):
-        return((-self.weights[0][0] - (self.weights[0][1]*X))/self.weights[0][2])
 
     def adjust(self, error, X):
         self.weights += self.eta * error * np.array(X)
@@ -45,6 +42,7 @@ class Perceptron(object):
                     not_done = True
                     self.error_freq += 1
                     self.adjust(error, element['coord'])
+                    self.lines.append([self.weights[0][0], self.weights[0][1], self.weights[0][2]])
             # self.slopes.append(self.weights[0][1])
 
         self.trained = True

@@ -1,4 +1,5 @@
 import json
+import weakref
 import numpy as np
 from os import path
 from perceptron import Perceptron
@@ -17,6 +18,8 @@ file.write('[]')
 file.close()
 global quit_button
 global train_button
+global weights_button
+global weights
 
 
 class Layout(object):
@@ -77,33 +80,48 @@ def _quit():
     # Fatal Python Error: PyEval_RestoreThread: NULL tstate
 
 
+def _initialize_weights(w0_field, w1_field, w2_field):
+    train_button.config(state='normal')
+    weights_button.config(state='disabled')
+    try:
+        weights = [float(w0_field.get()), float(
+            w1_field.get()), float(w2_field.get())]
+        
+        x = np.linspace(-5, 5, 100)
+        y = (weights[0] - (weights[1]*x))/weights[2]
+        layout.ax.plot(x, y)
+        layout.canvas.draw()
+    except ValueError as error:
+        messagebox.showerror(
+            error, 'Input values must be float (for eta) and integer (for epoch limit)!')
+
 # Starts the perceptron algorithm
-def _train(eta_field, epoch_field, w0_field, w1_field, w2_field):
+
+
+def _train(eta_field, epoch_field):
     try:
         eta = float(eta_field.get())
         epoch_limit = int(epoch_field.get())
-        weights = [float(w0_field.get()), float(
-            w1_field.get()), float(w2_field.get())]
-
-        train_button.config(state='disabled')
-        quit_button.config(state='disabled')
 
         with open('test.json', 'r') as json_file:
             data = json.load(json_file)
         trainer = Perceptron(data, eta, epoch_limit, weights)
         trainer.process()
-        print(trainer.weights)
+        # print(trainer.weights)
 
+        # TODO: Add animation to line
         x = np.linspace(-5, 5, 100)
-        layout.ax.plot(x, trainer.linear_function(x))
-        layout.canvas.draw()
+        for line in trainer.lines:
+            y = (line[0] - (line[1]*x))/line[2]
+            layout.ax.plot(x, y)
+            layout.canvas.draw()
         # window = tk.Toplevel(root)
     except ValueError as error:
         messagebox.showerror(
             error, 'Input values must be float (for eta) and integer (for epoch limit)!')
 
 
-# TODO: Add buttons, labels and number fields
+# TODO: Add weight vector initializer button and the linear function created by those weights
 if __name__ == "__main__":
     layout = Layout(root, 'Perceptron', 5)
 
@@ -119,19 +137,25 @@ if __name__ == "__main__":
     epoch_label.place(x=1, y=680)
 
     weights_label = tk.Label(root, text='ω0: \t ω1: \t   ω2: ')
-    w0_field = tk.Spinbox(master=root, from_=1, to=10, increment=.1, width=3)
-    w1_field = tk.Spinbox(master=root, from_=1, to=10, increment=.1, width=3)
-    w2_field = tk.Spinbox(master=root, from_=1, to=10, increment=.1, width=3)
+    w0_field = tk.Spinbox(master=root, from_=.1, to=10, increment=.1, width=3)
+    w1_field = tk.Spinbox(master=root, from_=.1, to=10, increment=.1, width=3)
+    w2_field = tk.Spinbox(master=root, from_=.1, to=10, increment=.1, width=3)
     weights_label.place(x=1, y=705)
     w0_field.place(x=28, y=705)
     w1_field.place(x=98, y=705)
     w2_field.place(x=168, y=705)
+    weights = []
 
     quit_button = tk.Button(master=root, text='Quit', command=_quit)
     quit_button.pack(side=tk.RIGHT)
 
+    weights_button = tk.Button(
+        master=root, text='Initialize weights', command=lambda: _initialize_weights(w0_field, w1_field, w2_field))
+    weights_button.pack(side=tk.RIGHT)
+
     train_button = tk.Button(
-        master=root, text='Start Trainning', command=lambda: _train(eta_field, epoch_field, w0_field, w1_field, w2_field))
+        master=root, text='Start Trainning', command=lambda: _train(eta_field, epoch_field))
     train_button.pack(side=tk.RIGHT)
 
+    train_button.config(state='disabled')
     tk.mainloop()
