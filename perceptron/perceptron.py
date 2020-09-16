@@ -2,6 +2,7 @@ import json
 import numpy as np
 import weakref
 import matplotlib.pyplot as plt
+from matplotlib.ticker import MaxNLocator
 
 # * Notes: Depending on the distribution and amount of data and its linear relationship,
 # * the convergence of the algorithm can be faster or slower;
@@ -11,9 +12,8 @@ import matplotlib.pyplot as plt
 class Perceptron(object):
     def __init__(self, bulk_data, eta=0.3, epoch_limit=100, weights=None):
         self.eta = eta
-        self.error_freq = 0
-        self.trained = False
         self.data = bulk_data
+        self.error_freq = []
         self.current_epoch = 0
         self.epoch_limit = epoch_limit
         if(weights):
@@ -42,36 +42,43 @@ class Perceptron(object):
         # or the epoch limit is reached
         while(not_done and (self.current_epoch <= self.epoch_limit)):
             self.current_epoch += 1
+            error_freq = 0
             not_done = False
             for element in self.data:
                 error = element['expected'] - self.activation(element['coord'])
                 if(error != 0):
                     not_done = True
-                    self.error_freq += 1
+                    error_freq += 1
                     self.adjust(error, element['coord'])
                     self.lines.append(
                         [self.weights[0][0], self.weights[0][1], self.weights[0][2]])
-
-        self.trained = True
+            self.error_freq.append(error_freq)
 
 
 if __name__ == "__main__":
     with open('test.json', 'r') as json_file:
         data = json.load(json_file)
 
-    perceptron = Perceptron(data, eta=0.1, epoch_limit=10000)
+    perceptron = Perceptron(data, eta=0.1, epoch_limit=500)
     perceptron.process()
 
-    for element in data:
-        sym = 'ro'
-        if(element['expected'] == 1):
-            sym = 'bo'
-        plt.plot(element['coord'][1], element['coord'][2], sym)
+    # for element in data:
+    #     sym = 'ro'
+    #     if(element['expected'] == 1):
+    #         sym = 'bo'
+    #     plt.plot(element['coord'][1], element['coord'][2], sym)
 
     # The line drawing must be re-done because of the origin of the line
-    print(perceptron.weights)
-    x = np.linspace(-5, 5, 100)
-    plt.plot(x, perceptron.linear_function(x))
+    ax = plt.figure().gca()
+    ax.xaxis.set_major_locator(MaxNLocator(integer=True))
+    x = np.arange(perceptron.current_epoch)
+    plt.bar(x, height=perceptron.error_freq)
+    print(perceptron.error_freq)
+    # plt.xticks(x,)
+    # x = np.linspace(-5, 5, 100)
+    # y = y = (perceptron.weights[0][0] -
+    #          (perceptron.weights[0][1]*x))/perceptron.weights[0][2]
+    # plt.plot(x, y)
     plt.show()
     # axes = plt.axis()
     # while(perceptron.slopes):

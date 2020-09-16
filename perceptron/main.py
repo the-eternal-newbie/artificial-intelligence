@@ -13,10 +13,10 @@ from matplotlib.backend_bases import key_press_handler
 
 root = tk.Tk()
 root.wm_title("HW1 - Perceptron")
-file = open('test.json', 'w')   # Everytime the program is executed, 
-                                # the a new file is created, replacing the previous one
-                                # (to erase all previous data)
-file.write('[]') # Writes a json list element
+file = open('test.json', 'w')   # Everytime the program is executed,
+# the a new file is created, replacing the previous one
+# (to erase all previous data)
+file.write('[]')  # Writes a json list element
 file.close()
 global quit_button
 global train_button
@@ -76,6 +76,34 @@ class Layout(object):
                 json.dump(data, file)
 
 
+class ErrorLayout(object):
+    def __init__(self, root, title, x_limit=5, y_limit=5):
+        fig = Figure(figsize=(7, 7), dpi=100)
+        self.ax = fig.add_subplot(111)
+        self.ax.set_title(title)
+
+        # Makes the plot fixed (prevents from resizing)
+        self.ax.set(xlim=(0, x_limit), ylim=(0, y_limit))
+        self.ax = fig.gca()
+        self.ax.xaxis.set_major_locator(MaxNLocator(integer=True))
+        # Connect the plot with the GUI interface
+        self.canvas = FigureCanvasTkAgg(fig, master=root)
+        self.canvas.draw()
+        self.canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+
+        toolbar = NavigationToolbar2Tk(self.canvas, root)
+        toolbar.update()
+        self.canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+
+
+def window_error(epoch_amount, error_freq):
+    window = tk.Toplevel(root)
+    error_view = ErrorLayout(window, 'Error')
+    x = np.arange(epoch_amount)
+    error_view.ax.bar(x, height=error_freq)
+    error_view.canvas.draw()
+
+
 def _quit():
     root.quit()     # stops mainloop
     root.destroy()  # this is necessary on Windows to prevent
@@ -111,11 +139,15 @@ def _train(eta_field, epoch_field):
 
         # TODO: Add animation to line
         x = np.linspace(-5, 5, 100)
-        for line in trainer.lines:
-            y = (line[0] - (line[1]*x))/line[2]
-            layout.ax.plot(x, y)
-            layout.canvas.draw()
-        # window = tk.Toplevel(root)
+        y = (trainer.weights[0][0] -
+             (trainer.weights[0][1]*x))/trainer.weights[0][2]
+        layout.ax.plot(x, y)
+        layout.canvas.draw()
+
+        # for line in trainer.lines:
+        #     layout.ax.plot(x, y)
+        #     layout.canvas.draw()
+        window_error(trainer.current_epoch, trainer.error_freq)
     except ValueError as error:
         messagebox.showerror(
             error, 'Input values must be float (for eta) and integer (for epoch limit)!')
