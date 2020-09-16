@@ -18,7 +18,8 @@ file.close()
 class Layout(object):
     def __init__(self, root):
         fig = Figure(figsize=(7, 7), dpi=100)
-        ax = fig.gca()
+        self.ax = fig.add_subplot(111)
+        self.ax.set(xlim=(0, 1), ylim=(0, 1))  # arbitrary data
 
         self.canvas = FigureCanvasTkAgg(fig, master=root)
         self.canvas.draw()
@@ -27,15 +28,18 @@ class Layout(object):
 
     # Left click -> Class with 0s
     # Right click -> Class with 1s
-    @staticmethod
-    def on_click(event):
+    # @staticmethod
+    def on_click(self, event):
         ix, iy = event.xdata, event.ydata
         point = {'coord': None, 'expected': None}
-        if(event.button == 1):
-            point['expected'] = 0
-        elif(event.button == 3):
+        color = 'orange'
+        point['expected'] = 0
+        if(event.button == 3):
             point['expected'] = 1
+            color = 'purple'
         point['coord'] = [ix, iy]
+        self.ax.scatter(point['coord'][0], point['coord'][1], color=color)
+        self.canvas.draw()
         # Open the file, then read it to append new points in active session
         with open('perceptron/test.json', 'r+') as file:
             data = json.load(file)
