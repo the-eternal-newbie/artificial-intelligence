@@ -13,7 +13,7 @@ from matplotlib.backend_bases import key_press_handler
 
 root = tk.Tk()
 root.wm_title("HW1 - Perceptron")
-file = open('test.json', 'w')   # Everytime the program is executed,
+file = open('bulk_data.json', 'w')   # Everytime the program is executed,
 # the a new file is created, replacing the previous one
 # (to erase all previous data)
 file.write('[]')  # Writes a json list element
@@ -69,7 +69,7 @@ class Layout(object):
             self.ax.scatter(point['coord'][1], point['coord'][2], color=color)
             self.canvas.draw()  # Refreshes the canvas
             # Open the file, then read it to append new points in active session
-            with open('test.json', 'r+') as file:
+            with open('bulk_data.json', 'r+') as file:
                 data = json.load(file)
                 data.append(point)
                 file.seek(0)
@@ -132,7 +132,7 @@ def _train(eta_field, epoch_field):
         eta = float(eta_field.get())
         epoch_limit = int(epoch_field.get())
 
-        with open('test.json', 'r') as json_file:
+        with open('bulk_data.json', 'r') as json_file:
             data = json.load(json_file)
         trainer = Perceptron(data, eta, epoch_limit, weights)
         trainer.process()

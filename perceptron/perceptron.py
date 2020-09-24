@@ -56,7 +56,7 @@ class Perceptron(object):
 
 
 if __name__ == "__main__":
-    with open('test.json', 'r') as json_file:
+    with open('bulk_data.json', 'r') as json_file:
         data = json.load(json_file)
 
     perceptron = Perceptron(data, eta=0.1, epoch_limit=500)
