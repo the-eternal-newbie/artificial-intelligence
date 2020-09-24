@@ -23,7 +23,6 @@ global train_button
 global weights_button
 global weights
 
-
 class Layout(object):
     def __init__(self, root, title, size=5):
         fig = Figure(figsize=(7, 7), dpi=100)
@@ -98,6 +97,7 @@ class ErrorLayout(object):
 
 def window_error(epoch_amount, error_freq):
     window = tk.Toplevel(root)
+    window.geometry("+900")
     error_view = ErrorLayout(window, 'Error')
     x = np.arange(epoch_amount)
     error_view.ax.bar(x, height=error_freq)
@@ -119,7 +119,7 @@ def _initialize_weights(w0_field, w1_field, w2_field):
 
         x = np.linspace(-5, 5, 100)
         y = (weights[0] - (weights[1]*x))/weights[2]
-        layout.ax.plot(x, y)
+        layout.ax.plot(x, y, color='red')
         layout.canvas.draw()
     except ValueError as error:
         messagebox.showerror(
@@ -137,16 +137,21 @@ def _train(eta_field, epoch_field):
         trainer = Perceptron(data, eta, epoch_limit, weights)
         trainer.process()
 
+        l = layout.ax.lines.pop(2)
+        wl = weakref.ref(l)
+        # l.remove()
+        del l
         # TODO: Add animation to line
         x = np.linspace(-5, 5, 100)
-        y = (trainer.weights[0][0] -
-             (trainer.weights[0][1]*x))/trainer.weights[0][2]
-        layout.ax.plot(x, y)
-        layout.canvas.draw()
+        for line in trainer.lines:
+            y = (line[0] - (line[1]*x))/line[2]
+            lines = layout.ax.plot(x, y, color='red')
+            l = lines.pop()
+            wl = weakref.ref(l)
+            layout.canvas.draw()
+            l.remove()
+            del l
 
-        # for line in trainer.lines:
-        #     layout.ax.plot(x, y)
-        #     layout.canvas.draw()
         window_error(trainer.current_epoch, trainer.error_freq)
     except ValueError as error:
         messagebox.showerror(
@@ -180,7 +185,7 @@ if __name__ == "__main__":
     w1_field.place(x=98, y=705)
     w2_field.place(x=168, y=705)
     weights = []    # declares the weights variable in the global scope of the program
-
+    
     # Creates three buttons (to initialize the weight vector, to start the perceptron's training and to quit the program)
     quit_button = tk.Button(master=root, text='Quit', command=_quit)
     quit_button.pack(side=tk.RIGHT)

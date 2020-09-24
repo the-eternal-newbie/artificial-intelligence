@@ -25,7 +25,7 @@ class Perceptron(object):
     #       Perceptron function Pω(x^j):
     # !         ωx
     def activation(self, X):
-        # np.dot() function is a function to calculat the dot product between two or more vectors
+        # np.dot() function is a function to calculate the dot product between two or more vectors
         if(np.dot(self.weights, np.array(X)) >= 0):
             return(1)
         return(0)
