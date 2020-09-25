@@ -23,6 +23,7 @@ global train_button
 global weights_button
 global weights
 
+
 class Layout(object):
     def __init__(self, root, title, size=5):
         fig = Figure(figsize=(7, 7), dpi=100)
@@ -80,7 +81,6 @@ class ErrorLayout(object):
         fig = Figure(figsize=(7, 7), dpi=100)
         self.ax = fig.add_subplot(111)
         self.ax.set_title(title)
-
         # Makes the plot fixed (prevents from resizing)
         self.ax.set(xlim=(0, x_limit), ylim=(0, y_limit))
         self.ax = fig.gca()
@@ -97,10 +97,12 @@ class ErrorLayout(object):
 
 def window_error(epoch_amount, error_freq):
     window = tk.Toplevel(root)
-    window.geometry("+900")
-    error_view = ErrorLayout(window, 'Error')
+    window.geometry("700x800+900+100")
+    error_view = ErrorLayout(
+        window, 'Error', x_limit=epoch_amount, y_limit=max(error_freq))
     x = np.arange(epoch_amount)
-    error_view.ax.bar(x, height=error_freq)
+    error_view.ax.bar(x, height=error_freq, align='edge',
+                      width=0.6, color='orange')
     error_view.canvas.draw()
 
 
@@ -185,7 +187,7 @@ if __name__ == "__main__":
     w1_field.place(x=98, y=705)
     w2_field.place(x=168, y=705)
     weights = []    # declares the weights variable in the global scope of the program
-    
+
     # Creates three buttons (to initialize the weight vector, to start the perceptron's training and to quit the program)
     quit_button = tk.Button(master=root, text='Quit', command=_quit)
     quit_button.pack(side=tk.RIGHT)
