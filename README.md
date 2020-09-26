@@ -1,5 +1,9 @@
 # Artificial Intelligence
 
+## Projects
+- [Perceptron](https://github.com/the-eternal-newbie/artificial-intelligence/tree/master/perceptron)
+- [Adaline]
+
 ## Summary
 This project is intended to host the main artificial intelligence algorithms and more specifically those related to machine learning; it extends from the main artificial neurons to more complex neural networks, all accompanied by graphical interfaces and theoretical content. The theoretical content is based on the content taught in the subject of Artificial Intelligence II at UdG's CUCEI, by [Dr. Nancy Guadalupe Arana Daniel](http://www.cucei.udg.mx/doctorados/electronica/es/dra-nancy-guadalupe-arana-daniel).
 
@@ -75,7 +79,3 @@ Tkinter is a Python binding to the Tk GUI toolkit. It is the standard Python int
 <img src=https://warehouse-camo.ingress.cmh1.psfhosted.org/42ca79ff99d75bf2cb4e6097c8006b52d36484df/68747470733a2f2f6d6174706c6f746c69622e6f72672f5f7374617469632f6c6f676f322e737667 width=300p align=left></br></br></br>
 Matplotlib is a comprehensive library for creating static, animated, and interactive visualizations in Python. Matplotlib produces publication-quality figures in a variety of hardcopy formats and interactive environments across platforms. Matplotlib can be used in Python scripts, the Python and IPython shell, web application servers, and various graphical user interface toolkits.
 <img src=https://warehouse-camo.ingress.cmh1.psfhosted.org/e7ea6d65132d8dca8553640aac16d4b6389f89d6/68747470733a2f2f6d6174706c6f746c69622e6f72672f5f7374617469632f726561646d655f707265766965772e706e67 width=700p align=center>
-
-## Content
-- [Perceptron](https://github.com/the-eternal-newbie/artificial-intelligence/tree/master/perceptron)
-- [Adaline]
