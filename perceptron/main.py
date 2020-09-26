@@ -13,9 +13,8 @@ from matplotlib.backend_bases import key_press_handler
 
 root = tk.Tk()
 root.wm_title("HW1 - Perceptron")
-file = open('bulk_data.json', 'w')   # Everytime the program is executed,
-# the a new file is created, replacing the previous one
-# (to erase all previous data)
+# Everytime the program is executed, a new file is created, replacing the previous one to erase previous data
+file = open('bulk_data.json', 'w')
 file.write('[]')  # Writes a json list element
 file.close()
 global quit_button
@@ -23,10 +22,11 @@ global train_button
 global weights_button
 global weights
 
-
 class Layout(object):
     def __init__(self, root, title, size=5):
         fig = Figure(figsize=(7, 7), dpi=100)
+        self.weights = None
+        self.has_been_trained = False
         self.ax = fig.add_subplot(111)
         self.ax.set_title(title)
 
@@ -55,25 +55,40 @@ class Layout(object):
     # Right click -> Class with 1s
     def on_click(self, event):
         ix, iy = event.xdata, event.ydata
-        if(ix != None):
-            point = {'coord': None, 'expected': None}
-            color = 'orange'
-            point['expected'] = 0
-            if(event.button == 3):
-                point['expected'] = 1
-                color = 'purple'
-            # The round operation on the coords is to prevent a slow convergence of the algorithm,
-            # the plot detects a very precise coord of almost 10 decimal places and it is harder for
-            # the algorithm to process those values
+        if(self.has_been_trained):
+            point = {'coord': None, 'class': None, 'color': 'red'}
             point['coord'] = [-1, round(ix, 2), round(iy, 2)]
-            self.ax.scatter(point['coord'][1], point['coord'][2], color=color)
+            point['class'] = 0
+            if(np.dot(self.weights, np.array(point['coord'])) >= 0):
+                point['class'] = 1
+                point['color'] = 'green'
+
+            self.ax.scatter(point['coord'][1],
+                            point['coord'][2], color=point['color'])
+            self.ax.annotate('Class {}'.format(
+                point['class']), (point['coord'][1]+.5, point['coord'][2]))
             self.canvas.draw()  # Refreshes the canvas
-            # Open the file, then read it to append new points in active session
-            with open('bulk_data.json', 'r+') as file:
-                data = json.load(file)
-                data.append(point)
-                file.seek(0)
-                json.dump(data, file)
+        else:
+            if(ix != None):
+                point = {'coord': None, 'expected': None}
+                color = 'orange'
+                point['expected'] = 0
+                if(event.button == 3):
+                    point['expected'] = 1
+                    color = 'purple'
+                # The round operation on the coords is to prevent a slow convergence of the algorithm,
+                # the plot detects a very precise coord of almost 10 decimal places and it is harder for
+                # the algorithm to process those values
+                point['coord'] = [-1, round(ix, 2), round(iy, 2)]
+                self.ax.scatter(point['coord'][1],
+                                point['coord'][2], color=color)
+                self.canvas.draw()  # Refreshes the canvas
+                # Open the file, then read it to append new points in active session
+                with open('bulk_data.json', 'r+') as file:
+                    data = json.load(file)
+                    data.append(point)
+                    file.seek(0)
+                    json.dump(data, file)
 
 
 class ErrorLayout(object):
@@ -108,8 +123,7 @@ def window_error(epoch_amount, error_freq):
 
 def _quit():
     root.quit()     # stops mainloop
-    root.destroy()  # this is necessary on Windows to prevent
-    # Fatal Python Error: PyEval_RestoreThread: NULL tstate
+    root.destroy()  # this is necessary on Windows to prevent Fatal Python Error: PyEval_RestoreThread: NULL tstate
 
 
 def _initialize_weights(w0_field, w1_field, w2_field):
@@ -152,14 +166,14 @@ def _train(eta_field, epoch_field):
         try:
             trainer = Perceptron(**args)
             trainer.process()
+            layout.weights = trainer.weights
+            layout.has_been_trained = True
         except AttributeError as error:
             messagebox.showerror(error, 'Provided data not found!')
 
         l = layout.ax.lines.pop(2)
         wl = weakref.ref(l)
-        # l.remove()
         del l
-        # TODO: Add animation to line
         x = np.linspace(-5, 5, 100)
         for line in trainer.lines:
             y = (line[0] - (line[1]*x))/line[2]
@@ -169,17 +183,17 @@ def _train(eta_field, epoch_field):
             layout.canvas.draw()
             l.remove()
             del l
-
+        messagebox.showinfo('Perceptron training has finished',
+                            'The solution was found in the epoch number {}'.format(trainer.current_epoch))
         window_error(trainer.current_epoch, trainer.error_freq)
     except ValueError as error:
         messagebox.showerror(
             error, 'Input values must be float (for eta) and integer (for epoch limit)!')
 
 
-# TODO: Add weight vector initializer button and the linear function created by those weights
 if __name__ == "__main__":
     layout = Layout(root, 'Perceptron', 5)
-
+    
     # Creates the eta label and field
     eta_label = tk.Label(root, text='η value:', width=10, anchor=tk.S)
     eta_field = tk.Spinbox(master=root, from_=0, to=5, increment=.1, width=5)
@@ -203,7 +217,7 @@ if __name__ == "__main__":
     w1_field.place(x=98, y=705)
     w2_field.place(x=168, y=705)
     weights = []    # declares the weights variable in the global scope of the program
-
+    
     # Creates three buttons (to initialize the weight vector, to start the perceptron's training and to quit the program)
     quit_button = tk.Button(master=root, text='Quit', command=_quit)
     quit_button.pack(side=tk.RIGHT)

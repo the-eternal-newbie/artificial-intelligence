@@ -4,11 +4,10 @@ import weakref
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
 
+
 # * Notes: Depending on the distribution and amount of data and its linear relationship,
 # * the convergence of the algorithm can be faster or slower;
 # * the weights are really importan to adjust the division line
-
-
 class Perceptron(object):
     # def __init__(self, bulk_data, eta=0.3, epoch_limit=100, weights=None):
     def __init__(self, **kwargs):
