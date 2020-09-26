@@ -120,12 +120,16 @@ def _initialize_weights(w0_field, w1_field, w2_field):
             w1_field.get()), float(w2_field.get())]
 
         x = np.linspace(-5, 5, 100)
+        if(weights[2] == 0):
+            raise ValueError
         y = (weights[0] - (weights[1]*x))/weights[2]
         layout.ax.plot(x, y, color='red')
         layout.canvas.draw()
     except ValueError as error:
+        train_button.config(state='disabled')
+        weights_button.config(state='normal')
         messagebox.showerror(
-            error, 'Input values must be float (for eta) and integer (for epoch limit)!')
+            error, 'Weight values must be different from zero!')
 
 
 # Starts the perceptron algorithm
@@ -136,8 +140,20 @@ def _train(eta_field, epoch_field):
 
         with open('bulk_data.json', 'r') as json_file:
             data = json.load(json_file)
-        trainer = Perceptron(data, eta, epoch_limit, weights)
-        trainer.process()
+
+        args = {'bulk_data': data, 'weights': weights}
+        # If eta and epoch_limit are equal to zero, then, the Perceptron must take default values
+        # to do that, the args in initialization must be null
+        if(eta != 0):
+            args['eta'] = eta
+        if(epoch_limit != 0):
+            args['epoch_limit'] = epoch_limit
+
+        try:
+            trainer = Perceptron(**args)
+            trainer.process()
+        except AttributeError as error:
+            messagebox.showerror(error, 'Provided data not found!')
 
         l = layout.ax.lines.pop(2)
         wl = weakref.ref(l)
@@ -179,9 +195,9 @@ if __name__ == "__main__":
 
     # Creates the weights label and each field for the three weights
     weights_label = tk.Label(root, text='ω0: \t ω1: \t   ω2: ')
-    w0_field = tk.Spinbox(master=root, from_=.1, to=10, increment=.1, width=3)
-    w1_field = tk.Spinbox(master=root, from_=.1, to=10, increment=.1, width=3)
-    w2_field = tk.Spinbox(master=root, from_=.1, to=10, increment=.1, width=3)
+    w0_field = tk.Spinbox(master=root, from_=0, to=10, increment=.1, width=3)
+    w1_field = tk.Spinbox(master=root, from_=0, to=10, increment=.1, width=3)
+    w2_field = tk.Spinbox(master=root, from_=0, to=10, increment=.1, width=3)
     weights_label.place(x=1, y=705)
     w0_field.place(x=28, y=705)
     w1_field.place(x=98, y=705)

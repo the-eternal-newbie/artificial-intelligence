@@ -10,13 +10,16 @@ from matplotlib.ticker import MaxNLocator
 
 
 class Perceptron(object):
-    def __init__(self, bulk_data, eta=0.3, epoch_limit=100, weights=None):
-        self.eta = eta
-        self.data = bulk_data
+    # def __init__(self, bulk_data, eta=0.3, epoch_limit=100, weights=None):
+    def __init__(self, **kwargs):
+        self.eta = kwargs.get('eta', 0.3)
+        self.data = kwargs.get('bulk_data', None)
+        if(self.data == None):
+            raise AttributeError
         self.error_freq = []
         self.current_epoch = 0
-        self.epoch_limit = epoch_limit
-        if(weights):
+        self.epoch_limit = kwargs.get('epoch_limit', 100)
+        if(kwargs.get('weights', None)):
             self.weights = np.array([weights])
         else:
             self.weights = np.random.rand(1, 3)
