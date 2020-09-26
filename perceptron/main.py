@@ -1,7 +1,9 @@
 import json
+import sys
 import weakref
 import numpy as np
 from os import path
+from os import execl
 from perceptron import Perceptron
 import tkinter as tk
 from tkinter import messagebox
@@ -20,7 +22,9 @@ file.close()
 global quit_button
 global train_button
 global weights_button
+global refresh_button
 global weights
+
 
 class Layout(object):
     def __init__(self, root, title, size=5):
@@ -183,19 +187,27 @@ def _train(eta_field, epoch_field):
             layout.canvas.draw()
             l.remove()
             del l
-        y = (trainer.weights[0][0] - (trainer.weights[0][1]*x))/trainer.weights[0][2]
+        y = (trainer.weights[0][0] -
+             (trainer.weights[0][1]*x))/trainer.weights[0][2]
         layout.ax.plot(x, y, color='blue')
         messagebox.showinfo('Perceptron training has finished',
                             'The solution was found in the epoch number {}'.format(trainer.current_epoch))
+        refresh_button.config(state='normal')
         window_error(trainer.current_epoch, trainer.error_freq)
     except ValueError as error:
         messagebox.showerror(
             error, 'Input values must be float (for eta) and integer (for epoch limit)!')
 
 
+def _refresh():
+    root.destroy()
+    python = sys.executable
+    execl(python, python, *sys.argv)
+
+
 if __name__ == "__main__":
     layout = Layout(root, 'Perceptron', 5)
-    
+
     # Creates the eta label and field
     eta_label = tk.Label(root, text='η value:', width=10, anchor=tk.S)
     eta_field = tk.Spinbox(master=root, from_=0, to=5, increment=.1, width=5)
@@ -219,10 +231,13 @@ if __name__ == "__main__":
     w1_field.place(x=98, y=705)
     w2_field.place(x=168, y=705)
     weights = []    # declares the weights variable in the global scope of the program
-    
+
     # Creates three buttons (to initialize the weight vector, to start the perceptron's training and to quit the program)
     quit_button = tk.Button(master=root, text='Quit', command=_quit)
     quit_button.pack(side=tk.RIGHT)
+
+    refresh_button = tk.Button(master=root, text='Restart', command=_refresh)
+    refresh_button.pack(side=tk.RIGHT)
 
     weights_button = tk.Button(
         master=root, text='Initialize weights', command=lambda: _initialize_weights(w0_field, w1_field, w2_field))
@@ -234,4 +249,5 @@ if __name__ == "__main__":
 
     # Disables the train_button until the weight_button is pressed
     train_button.config(state='disabled')
+    refresh_button.config(state='disabled')
     tk.mainloop()
