@@ -137,7 +137,7 @@ def _initialize_weights(w0_field, w1_field, w2_field):
         if(weights[2] == 0):
             raise ValueError
         y = (weights[0] - (weights[1]*x))/weights[2]
-        layout.ax.plot(x, y, color='red')
+        layout.ax.plot(x, y, color='blue')
         layout.canvas.draw()
     except ValueError as error:
         train_button.config(state='disabled')
@@ -177,12 +177,14 @@ def _train(eta_field, epoch_field):
         x = np.linspace(-5, 5, 100)
         for line in trainer.lines:
             y = (line[0] - (line[1]*x))/line[2]
-            lines = layout.ax.plot(x, y, color='red')
+            lines = layout.ax.plot(x, y, color='blue')
             l = lines.pop()
             wl = weakref.ref(l)
             layout.canvas.draw()
             l.remove()
             del l
+        y = (trainer.weights[0][0] - (trainer.weights[0][1]*x))/trainer.weights[0][2]
+        layout.ax.plot(x, y, color='blue')
         messagebox.showinfo('Perceptron training has finished',
                             'The solution was found in the epoch number {}'.format(trainer.current_epoch))
         window_error(trainer.current_epoch, trainer.error_freq)
