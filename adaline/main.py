@@ -32,6 +32,7 @@ global quit_button
 global perceptron_button
 global weights_button
 global refresh_button
+global data_set
 global weights
 
 
@@ -93,11 +94,12 @@ class Layout(object):
                                 point['coord'][2], color=color)
                 self.canvas.draw()  # Refreshes the canvas
                 # Open the file, then read it to append new points in active session
-                with open('bulk_data.json', 'r+') as file:
-                    data = json.load(file)
-                    data.append(point)
-                    file.seek(0)
-                    json.dump(data, file)
+                data_set.append(point)
+                # with open('bulk_data.json', 'r+') as file:
+                #     data = json.load(file)
+                #     data.append(point)
+                #     file.seek(0)
+                #     json.dump(data, file)
 
 
 class ErrorLayout(object):
@@ -161,11 +163,11 @@ def _train(eta_field, epoch_field, type='perceptron'):
     try:
         eta = float(eta_field.get())
         epoch_limit = int(epoch_field.get())
+        with open('bulk_data.json', 'r+') as file:
+            file.seek(0)
+            json.dump(data_set, file)
 
-        with open('bulk_data.json', 'r') as json_file:
-            data = json.load(json_file)
-
-        args = {'bulk_data': data, 'weights': weights}
+        args = {'bulk_data': data_set, 'weights': weights}
         # If eta and epoch_limit are equal to zero, then, the Perceptron must take default values
         # to do that, the args in initialization must be null
         if(eta != 0):
@@ -200,7 +202,7 @@ def _train(eta_field, epoch_field, type='perceptron'):
         y = (trainer.weights[0][0] -
              (trainer.weights[0][1] * x)) / trainer.weights[0][2]
         layout.ax.plot(x, y, color='blue')
-        messagebox.showinfo('Perceptron training has finished',
+        messagebox.showinfo('{} training has finished'.format(type),
                             'The solution was found in the epoch number {}'.format(trainer.current_epoch))
         refresh_button.config(state='normal')
         window_error(trainer.current_epoch, trainer.error_freq)
@@ -216,6 +218,7 @@ def _refresh():
 
 
 if __name__ == "__main__":
+    data_set = []
     layout = Layout(root, 'Perceptron', 5)
 
     # Creates the eta label and field
@@ -234,7 +237,7 @@ if __name__ == "__main__":
     # Creates the squared error label and field
     sqre_label = tk.Label(root, text='Desired ε²:', width=10)
     sqre_field = tk.Spinbox(master=root, from_=0,
-                             to=10, increment=.1, width=5)
+                            to=10, increment=.1, width=5)
     sqre_field.place(x=85, y=740)
     sqre_label.place(x=1, y=740)
 
@@ -242,22 +245,22 @@ if __name__ == "__main__":
     weights_label = tk.Label(root, text='ω0:\n\nω1:\nω2:')
     w0_field = tk.Spinbox(master=root, from_=0, to=10, increment=.1, width=3)
     w0_label = tk.Label(root, text='ω₀:')
-    
+
     w1_field = tk.Spinbox(master=root, from_=0, to=10, increment=.1, width=3)
     w1_label = tk.Label(root, text='ω₁:')
-    
+
     w2_field = tk.Spinbox(master=root, from_=0, to=10, increment=.1, width=3)
     w2_label = tk.Label(root, text='ω₂:')
-    
+
     w0_field.place(x=178, y=700)
     w0_label.place(x=150, y=700)
-    
+
     w1_field.place(x=178, y=720)
     w1_label.place(x=150, y=720)
-    
+
     w2_field.place(x=178, y=740)
     w2_label.place(x=150, y=740)
-    
+
     weights = []    # declares the weights variable in the global scope of the program
 
     # * Creates three buttons (to initialize the weight vector, to start the perceptron's training and to quit the program)
