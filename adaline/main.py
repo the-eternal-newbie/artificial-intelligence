@@ -259,7 +259,7 @@ if __name__ == "__main__":
     # Creates the squared error label and field
     sqre_label = tk.Label(root, text='Desired ε²:', width=10)
     sqre_field = tk.Spinbox(master=root, from_=0,
-                            to=10, increment=.1, width=5)
+                            to=10, increment=.001, width=5)
     sqre_field.place(x=85, y=740)
     sqre_label.place(x=1, y=740)
 

@@ -2,7 +2,7 @@
 
 ## Projects
 - [Perceptron](https://github.com/the-eternal-newbie/artificial-intelligence/tree/master/perceptron)
-- [Adaline]
+- [Adaline](https://github.com/the-eternal-newbie/artificial-intelligence/tree/master/adaline)
 
 ## Summary
 This project is intended to host the main artificial intelligence algorithms and more specifically those related to machine learning; it extends from the main artificial neurons to more complex neural networks, all accompanied by graphical interfaces and theoretical content. The theoretical content is based on the content taught in the subject of Artificial Intelligence II at UdG's CUCEI, by [Dr. Nancy Guadalupe Arana Daniel](http://www.cucei.udg.mx/doctorados/electronica/es/dra-nancy-guadalupe-arana-daniel).
@@ -19,11 +19,15 @@ artificial-intelligence
 │   │   settings.json
 │   
 └───perceptron
+|   │   __init__.py
+|   │   ABOUT.md
 |   │   main.py
 |   │   perceptron.py
 |   │   ...
 │   
 └───adaline
+|   │   __init__.py
+|   │   ABOUT.md
 |   │   main.py
 |   │   adaline.py
 |   │   ...

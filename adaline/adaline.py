@@ -23,16 +23,20 @@ class Adaline(Perceptron):
 
     def process(self):
         current_sqre = 0
-        while((self.current_epoch <= self.epoch_limit) and self.sqre != current_sqre):
+        while((self.current_epoch <= self.epoch_limit)):
+            current_sqre = 0
             self.current_epoch += 1
             error_freq = 0
             for element in self.data:
                 error = element['expected'] - self.sigmoid(element['coord'])
-                current_sqre+= (error * error)
+                current_sqre += (error * error)
                 self.adjust(error, element['coord'])
             self.lines.append(
                 [self.weights[0][0], self.weights[0][1], self.weights[0][2]])
+            current_sqre /= len(self.data)
             self.error_freq.append(float(current_sqre))
+            if(current_sqre <= self.sqre):
+                break
 
 
 if __name__ == "__main__":
