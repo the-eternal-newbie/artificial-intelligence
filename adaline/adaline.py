@@ -32,7 +32,7 @@ class Adaline(Perceptron):
                 self.adjust(error, element['coord'])
             self.lines.append(
                 [self.weights[0][0], self.weights[0][1], self.weights[0][2]])
-            self.error_freq.append(current_sqre)
+            self.error_freq.append(float(current_sqre))
 
 
 if __name__ == "__main__":
@@ -41,5 +41,5 @@ if __name__ == "__main__":
     args = {'bulk_data': data}
     ada = Adaline(**args)
     ada.process()
-    print(ada.sqre)
+    print(ada.error_freq)
     print(ada.weights)

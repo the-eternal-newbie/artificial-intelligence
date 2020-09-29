@@ -70,7 +70,7 @@ class Layout(object):
         ix, iy = event.xdata, event.ydata
         if(ix != None):
             if(self.perceptron_trained and event.button == 3):
-                point = {'coord': None, 'class': None, 'color': 'red'}
+                point = {'coord': None, 'class': None, 'color': 'pink'}
                 point['coord'] = [-1, round(ix, 2), round(iy, 2)]
                 point['class'] = 0
                 if(np.dot(self.perceptron_weights, np.array(point['coord'])) >= 0):
@@ -84,12 +84,12 @@ class Layout(object):
                 self.canvas.draw()  # Refreshes the canvas
 
             elif(self.adaline_trained and event.button == 1):
-                point = {'coord': None, 'class': None, 'color': 'blue'}
+                point = {'coord': None, 'class': None, 'color': 'gray'}
                 point['coord'] = [-1, round(ix, 2), round(iy, 2)]
                 point['class'] = 1
                 y = np.dot(self.adaline_weights, np.array(point['coord']))
                 activation = 1 / (1 + np.exp(-y))
-                if(activation < 1):
+                if(activation <= 0.5):
                     point['class'] = 0
                     point['color'] = 'yellow'
 
@@ -159,7 +159,7 @@ def _initialize_weights(w0_field, w1_field, w2_field):
         if(weights[2] == 0):
             raise ValueError
         y = (weights[0] - (weights[1] * x)) / weights[2]
-        layout.ax.plot(x, y, color='blue')
+        layout.ax.plot(x, y, color='gray')
         layout.canvas.draw()
     except ValueError as error:
         perceptron_button.config(state='disabled')
@@ -212,7 +212,7 @@ def _train(eta_field, epoch_field, neuron='perceptron', sqre_field=None):
         if(neuron == 'perceptron'):
             line_color = 'blue'
         elif(neuron == 'adaline'):
-            line_color = 'pink'
+            line_color = 'red'
         for line in trainer.lines:
             y = (line[0] - (line[1] * x)) / line[2]
             lines = layout.ax.plot(x, y, color=line_color)
