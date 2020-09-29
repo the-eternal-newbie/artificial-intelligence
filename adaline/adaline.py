@@ -9,7 +9,30 @@ from perceptron import Perceptron
 
 
 class Adaline(Perceptron):
-    pass
+    def __init__(self, **kwargs):
+        self.sqre = kwargs.get('sqre', 1.5)
+        super().__init__(**kwargs)
+
+    def sigmoid(self, X):
+        y = np.dot(self.weights, np.array(X))
+        return 1 / (1 + np.exp(-y))
+
+    def adjust(self, error, X):
+        self.weights += self.eta * error * \
+            (self.sigmoid(X) * (1 - self.sigmoid(X))) * np.array(X)
+
+    def process(self):
+        current_sqre = 0
+        while((self.current_epoch <= self.epoch_limit) and self.sqre != current_sqre):
+            self.current_epoch += 1
+            error_freq = 0
+            for element in self.data:
+                error = element['expected'] - self.sigmoid(element['coord'])
+                current_sqre+= (error * error)
+                self.adjust(error, element['coord'])
+                self.lines.append(
+                    [self.weights[0][0], self.weights[0][1], self.weights[0][2]])
+            self.error_freq.append(current_sqre)
 
 
 if __name__ == "__main__":
@@ -18,4 +41,5 @@ if __name__ == "__main__":
     args = {'bulk_data': data}
     ada = Adaline(**args)
     ada.process()
+    print(ada.sqre)
     print(ada.weights)

@@ -30,6 +30,7 @@ file.write('[]')  # Writes a json list element
 file.close()
 global quit_button
 global perceptron_button
+global adaline_button
 global weights_button
 global refresh_button
 global data_set
@@ -136,6 +137,7 @@ def _quit():
 
 def _initialize_weights(w0_field, w1_field, w2_field):
     perceptron_button.config(state='normal')
+    adaline_button.config(state='normal')
     weights_button.config(state='disabled')
     try:
         weights = [float(w0_field.get()), float(
@@ -149,30 +151,35 @@ def _initialize_weights(w0_field, w1_field, w2_field):
         layout.canvas.draw()
     except ValueError as error:
         perceptron_button.config(state='disabled')
+        adaline_button.config(state='disabled')
         weights_button.config(state='normal')
         messagebox.showerror(
             error, 'Weight values must be different from zero!')
 
 
 # Starts the perceptron algorithm
-def _train(eta_field, epoch_field, type='perceptron'):
+def _train(eta_field, epoch_field, neuron='perceptron', sqre_field=None):
     try:
         eta = float(eta_field.get())
         epoch_limit = int(epoch_field.get())
+        sqre = 0 if sqre_field == None else float(sqre_field.get())
         with open('bulk_data.json', 'r+') as file:
             file.seek(0)
             json.dump(data_set, file)
 
         args = {'bulk_data': data_set, 'weights': weights}
-        # If eta and epoch_limit are equal to zero, then, the Perceptron must take default values
-        # to do that, the args in initialization must be null
+        # If eta, epoch_limit or the desired quadratic error are equal to zero,
+        # then, the Neuron must take default values; to do that
+        # the args in initialization must be null
         if(eta != 0):
             args['eta'] = eta
         if(epoch_limit != 0):
             args['epoch_limit'] = epoch_limit
+        if(neuron == 'adaline' and sqre != 0):
+            args['sqre'] = sqre
 
         try:
-            if(type == 'perceptron'):
+            if(neuron == 'perceptron'):
                 trainer = Perceptron(**args)
             else:
                 trainer = Adaline(**args)
@@ -187,9 +194,13 @@ def _train(eta_field, epoch_field, type='perceptron'):
         wl = weakref.ref(l)
         del l
         x = np.linspace(-5, 5, 100)
+        if(neuron == 'perceptron'):
+            line_color = 'blue'
+        else:
+            line_color = 'pink'
         for line in trainer.lines:
             y = (line[0] - (line[1] * x)) / line[2]
-            lines = layout.ax.plot(x, y, color='blue')
+            lines = layout.ax.plot(x, y, color=line_color)
             l = lines.pop()
             wl = weakref.ref(l)
             layout.canvas.draw()
@@ -197,14 +208,14 @@ def _train(eta_field, epoch_field, type='perceptron'):
             del l
         y = (trainer.weights[0][0] -
              (trainer.weights[0][1] * x)) / trainer.weights[0][2]
-        layout.ax.plot(x, y, color='blue')
-        messagebox.showinfo('{} training has finished'.format(type),
+        layout.ax.plot(x, y, color=line_color)
+        messagebox.showinfo('{} training has finished'.format(neuron.title()),
                             'The solution was found in the epoch number {}'.format(trainer.current_epoch))
         refresh_button.config(state='normal')
         window_error(trainer.current_epoch, trainer.error_freq)
     except ValueError as error:
         messagebox.showerror(
-            error, 'Input values must be float (for eta) and integer (for epoch limit)!')
+            error, 'Input values must be float (for eta & quadratic error) and integer (for epoch limit)!')
 
 
 def _refresh():
@@ -272,11 +283,11 @@ if __name__ == "__main__":
 
     # * Training buttons
     perceptron_button = tk.Button(
-        master=root, text='Start Perceptron Trainning', command=lambda: _train(eta_field, epoch_field, 'perceptron'))
+        master=root, text='Start Perceptron Trainning', command=lambda: _train(eta_field=eta_field, epoch_field=epoch_field, neuron='perceptron'))
     perceptron_button.place(x=326, y=700)
 
     adaline_button = tk.Button(
-        master=root, text='Start Adaline Trainning', command=lambda: _train(eta_field, epoch_field, 'adaline'))
+        master=root, text='Start Adaline Trainning', command=lambda: _train(eta_field=eta_field, epoch_field=epoch_field, sqre_field=sqre_field, neuron='perceptron'))
     adaline_button.place(x=523, y=700)
 
     # Disables the perceptron & adaline buttons until the weight_button is pressed
