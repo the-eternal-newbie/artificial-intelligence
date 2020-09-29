@@ -30,8 +30,8 @@ class Adaline(Perceptron):
                 error = element['expected'] - self.sigmoid(element['coord'])
                 current_sqre+= (error * error)
                 self.adjust(error, element['coord'])
-                self.lines.append(
-                    [self.weights[0][0], self.weights[0][1], self.weights[0][2]])
+            self.lines.append(
+                [self.weights[0][0], self.weights[0][1], self.weights[0][2]])
             self.error_freq.append(current_sqre)
 
 

@@ -40,8 +40,10 @@ global weights
 class Layout(object):
     def __init__(self, root, title, size=5):
         fig = Figure(figsize=(7, 7), dpi=100)
-        self.weights = None
-        self.has_been_trained = False
+        self.perceptron_weights = None
+        self.perceptron_trained = False
+        self.adaline_weights = None
+        self.adaline_trained = False
         self.ax = fig.add_subplot(111)
         self.ax.set_title(title)
 
@@ -66,21 +68,37 @@ class Layout(object):
     # Right click -> Class with 1s
     def on_click(self, event):
         ix, iy = event.xdata, event.ydata
-        if(self.has_been_trained):
-            point = {'coord': None, 'class': None, 'color': 'red'}
-            point['coord'] = [-1, round(ix, 2), round(iy, 2)]
-            point['class'] = 0
-            if(np.dot(self.weights, np.array(point['coord'])) >= 0):
-                point['class'] = 1
-                point['color'] = 'green'
+        if(ix != None):
+            if(self.perceptron_trained and event.button == 3):
+                point = {'coord': None, 'class': None, 'color': 'red'}
+                point['coord'] = [-1, round(ix, 2), round(iy, 2)]
+                point['class'] = 0
+                if(np.dot(self.perceptron_weights, np.array(point['coord'])) >= 0):
+                    point['class'] = 1
+                    point['color'] = 'green'
 
-            self.ax.scatter(point['coord'][1],
-                            point['coord'][2], color=point['color'])
-            self.ax.annotate('Class {}'.format(
-                point['class']), (point['coord'][1] + .5, point['coord'][2]))
-            self.canvas.draw()  # Refreshes the canvas
-        else:
-            if(ix != None):
+                self.ax.scatter(point['coord'][1],
+                                point['coord'][2], color=point['color'])
+                self.ax.annotate('Class {}'.format(
+                    point['class']), (point['coord'][1] + .5, point['coord'][2]))
+                self.canvas.draw()  # Refreshes the canvas
+
+            elif(self.adaline_trained and event.button == 1):
+                point = {'coord': None, 'class': None, 'color': 'blue'}
+                point['coord'] = [-1, round(ix, 2), round(iy, 2)]
+                point['class'] = 1
+                y = np.dot(self.adaline_weights, np.array(point['coord']))
+                activation = 1 / (1 + np.exp(-y))
+                if(activation < 1):
+                    point['class'] = 0
+                    point['color'] = 'yellow'
+
+                self.ax.scatter(point['coord'][1],
+                                point['coord'][2], color=point['color'])
+                self.ax.annotate('Class {}'.format(
+                    point['class']), (point['coord'][1] + .5, point['coord'][2]))
+                self.canvas.draw()  # Refreshes the canvas
+            else:
                 point = {'coord': None, 'expected': None}
                 color = 'orange'
                 point['expected'] = 0
@@ -94,13 +112,7 @@ class Layout(object):
                 self.ax.scatter(point['coord'][1],
                                 point['coord'][2], color=color)
                 self.canvas.draw()  # Refreshes the canvas
-                # Open the file, then read it to append new points in active session
                 data_set.append(point)
-                # with open('bulk_data.json', 'r+') as file:
-                #     data = json.load(file)
-                #     data.append(point)
-                #     file.seek(0)
-                #     json.dump(data, file)
 
 
 class ErrorLayout(object):
@@ -181,22 +193,25 @@ def _train(eta_field, epoch_field, neuron='perceptron', sqre_field=None):
         try:
             if(neuron == 'perceptron'):
                 trainer = Perceptron(**args)
+                trainer.process()
+                layout.perceptron_weights = trainer.weights
+                layout.perceptron_trained = True
             else:
                 trainer = Adaline(**args)
-
-            trainer.process()
-            layout.weights = trainer.weights
-            layout.has_been_trained = True
+                trainer.process()
+                layout.adaline_weights = trainer.weights
+                layout.adaline_trained = True
         except AttributeError as error:
             messagebox.showerror(error, 'Provided data not found!')
 
-        l = layout.ax.lines.pop(2)
-        wl = weakref.ref(l)
-        del l
+        if(layout.adaline_trained == False or layout.perceptron_trained == False):
+            l = layout.ax.lines.pop(2)
+            wl = weakref.ref(l)
+            del l
         x = np.linspace(-5, 5, 100)
         if(neuron == 'perceptron'):
             line_color = 'blue'
-        else:
+        elif(neuron == 'adaline'):
             line_color = 'pink'
         for line in trainer.lines:
             y = (line[0] - (line[1] * x)) / line[2]
@@ -287,7 +302,7 @@ if __name__ == "__main__":
     perceptron_button.place(x=326, y=700)
 
     adaline_button = tk.Button(
-        master=root, text='Start Adaline Trainning', command=lambda: _train(eta_field=eta_field, epoch_field=epoch_field, sqre_field=sqre_field, neuron='perceptron'))
+        master=root, text='Start Adaline Trainning', command=lambda: _train(eta_field=eta_field, epoch_field=epoch_field, sqre_field=sqre_field, neuron='adaline'))
     adaline_button.place(x=523, y=700)
 
     # Disables the perceptron & adaline buttons until the weight_button is pressed
