@@ -114,16 +114,12 @@ class ErrorLayout(object):
         # Connect the plot with the GUI interface
         self.canvas = FigureCanvasTkAgg(fig, master=root)
         self.canvas.draw()
-        self.canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
-
-        toolbar = NavigationToolbar2Tk(self.canvas, root)
-        toolbar.update()
-        self.canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+        self.canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=False)
 
 
 def window_error(epoch_amount, error_freq):
     window = tk.Toplevel(root)
-    window.geometry("700x800+900+100")
+    window.geometry("700x765+750+68")
     window.resizable(False, False)
     error_view = ErrorLayout(
         window, 'Error', x_limit=epoch_amount, y_limit=max(error_freq))
