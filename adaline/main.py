@@ -298,11 +298,11 @@ if __name__ == "__main__":
 
     # * Training buttons
     perceptron_button = tk.Button(
-        master=root, text='Start Perceptron Trainning', command=lambda: _train(eta_field=eta_field, epoch_field=epoch_field, neuron='perceptron'))
+        master=root, text='Start Perceptron Training', command=lambda: _train(eta_field=eta_field, epoch_field=epoch_field, neuron='perceptron'))
     perceptron_button.place(x=326, y=700)
 
     adaline_button = tk.Button(
-        master=root, text='Start Adaline Trainning', command=lambda: _train(eta_field=eta_field, epoch_field=epoch_field, sqre_field=sqre_field, neuron='adaline'))
+        master=root, text='Start Adaline Training', command=lambda: _train(eta_field=eta_field, epoch_field=epoch_field, sqre_field=sqre_field, neuron='adaline'))
     adaline_button.place(x=523, y=700)
 
     # Disables the perceptron & adaline buttons until the weight_button is pressed
