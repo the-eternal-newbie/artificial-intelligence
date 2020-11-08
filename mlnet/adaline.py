@@ -1,5 +1,6 @@
 import numpy as np
-from perceptron import Perceptron
+from .perceptron import Perceptron
+# from perceptron import Perceptron
 
 
 # ! This class inherits from the Perceptron Class
@@ -7,9 +8,20 @@ class Adaline(Perceptron):
     def __init__(self, **kwargs):
         self.sqre = kwargs.get('sqre', 1.5)
         super().__init__(**kwargs)
+    
+    def net_value(self):
+        activation = 0
+        for element in self.data:
+            activation +=  np.dot(self.weights, element['coord'])
+        return activation
 
-    def sigmoid(self, X):
-        y = np.dot(self.weights, np.array(X))
+    def sensitivity(self):
+        pass
+
+    def sigmoid(self, X, net=False):
+        y = X
+        if not(net):
+            y = np.dot(self.weights, np.array(X))
         return 1 / (1 + np.exp(-y))
 
     def adjust(self, error, X):

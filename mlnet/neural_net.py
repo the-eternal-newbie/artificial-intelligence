@@ -2,7 +2,8 @@ import json
 import numpy as np
 import matplotlib.pyplot as plt
 
-from layer import Layer
+from .layer import Layer
+
 
 class Network(object):
     def __init__(self, **kwargs):
@@ -13,10 +14,11 @@ class Network(object):
         self.error_freq = []
         self.eta = kwargs.get('eta', 0.3)
         self.sqre = kwargs.get('sqre', 0.1)
+        self.num_class = kwargs.get('num_class', 2)
 
         self.current_epoch = 0
         self.epoch_limit = kwargs.get('epoch_limit', 100)
- 
+
         self.layers = []
         for _ in range(kwargs.get('hidden_layers', 1)):
             layer = Layer(**{
@@ -29,17 +31,16 @@ class Network(object):
             })
             self.layers.append(layer)
 
+        self.layers.append(Layer(**{
+            'type': 'output',
+            'algo': kwargs.get('algo', 'backprop'),
+            'data_set': self.data,
+            'eta': self.eta,
+            'epoch_limit': self.epoch_limit,
+            'sqre': self.sqre,
+            'size': self.num_class
+        }))
+
     def learn(self):
         for layer in self.layers:
             layer.process()
-
-if __name__ == "__main__":
-    with open('bulk_data.json', 'r+') as file:
-        data_set = json.load(file)
-    net = Network(**{
-        'bulk_data': data_set,
-        'algo': 'backprop',
-        'hidden_layers': 2,
-        'layer_neurons': 3,
-    })
-    net.learn()

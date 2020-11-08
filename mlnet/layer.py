@@ -1,30 +1,26 @@
 import numpy as np
-import algo
+from .algo import *
 
-from adaline import Adaline
+from .adaline import Adaline
 
 class Layer(object):
     def __init__(self, **kwargs):
         self.output = []
         self.neurons = []
         self.algo = kwargs.get('algo')
+        self.type = kwargs.get('type', 'hidden')
         for _ in range(kwargs.get('size')):
             neuron = Adaline(**{
                 'bulk_data': kwargs.get('data_set'),
                 'weights': kwargs.get('weights', None),
                 'eta': kwargs.get('eta'),
                 'epoch_limit': kwargs.get('epoch_limit'),
-                'sqre': kwargs.get('sqr')
+                'sqre': kwargs.get('sqre')
             })
             self.neurons.append(neuron)
 
     def process(self):
+        new_input = []
         for neuron in self.neurons:
-            if(self.algo == 'backprop'):
-                print('backprop')
-                algo.bp_forward()
-                algo.bp_backward()
-            elif(self.algo == 'quickprop'):
-                print('quickprop')
-                algo.qp_forward()
-                algo.qp_backward()
+            new_input.append(bp_forward(neuron)[0])
+        print(new_input)
