@@ -1,4 +1,5 @@
 import numpy as np
+import algo
 
 from adaline import Adaline
 
@@ -10,7 +11,7 @@ class Layer(object):
         for _ in range(kwargs.get('size')):
             neuron = Adaline(**{
                 'bulk_data': kwargs.get('data_set'),
-                'weights': kwargs.get('weights'),
+                'weights': kwargs.get('weights', None),
                 'eta': kwargs.get('eta'),
                 'epoch_limit': kwargs.get('epoch_limit'),
                 'sqre': kwargs.get('sqr')
@@ -18,7 +19,12 @@ class Layer(object):
             self.neurons.append(neuron)
 
     def process(self):
-        if(self.algo == 'backprop'):
-            print('backprop')
-        elif(self.algo == 'quickprop'):
-            print('quickprop')
+        for neuron in self.neurons:
+            if(self.algo == 'backprop'):
+                print('backprop')
+                algo.bp_forward()
+                algo.bp_backward()
+            elif(self.algo == 'quickprop'):
+                print('quickprop')
+                algo.qp_forward()
+                algo.qp_backward()
