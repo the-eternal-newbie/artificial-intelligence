@@ -1,6 +1,6 @@
 import sys
 sys.path.insert(
-    0, "/home/carlosvp/dev/school/ia_ii/artificial-intelligence/perceptron")
+    0, "./perceptron")
 import json
 import weakref
 import numpy as np
