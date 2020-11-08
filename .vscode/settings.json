@@ -1,5 +1,5 @@
 {
-    "python.pythonPath": "/home/carlosvp/dev/school/ia_ii/artificial-intelligence/env/bin/python3",
+    "python.pythonPath": "env/bin/python",
     "python.formatting.autopep8Args": [
         "--ignore",
         "E402"
