@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 class Network(object):
     def __init__(self, **kwargs):
         self.data = kwargs.get('bulk_data', None)
