@@ -18,7 +18,7 @@ class Perceptron(object):
         self.current_epoch = 0
         self.epoch_limit = kwargs.get('epoch_limit', 100)
         if(kwargs.get('weights', None)):
-            self.weights = np.array([weights])
+            self.weights = np.array([kwargs.get('weights')])
         else:
             self.weights = np.random.rand(1, 3)
         self.lines = []

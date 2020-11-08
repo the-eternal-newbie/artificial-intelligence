@@ -38,7 +38,7 @@ Weight adjustment is made when an error is found in the weight calculation. This
 #### Adjustment
 ![alt text][adjust]
 
-[perceptron]: img/model.jpeg
-[adjust]: img/adjust.png
-[error]: img/error.png
-[activation]: img/activation.png
+[perceptron]: ../img/model.jpeg
+[adjust]: ../img/adjust.png
+[error]: ../img/error.png
+[activation]: ../img/activation.png

@@ -13,11 +13,10 @@ from matplotlib.backends.backend_tkagg import (
     FigureCanvasTkAgg, NavigationToolbar2Tk)
 from matplotlib.backend_bases import key_press_handler
 
-sys.path.insert(0, "./neuron")
-sys.path.insert(0, "./network")
+sys.path.insert(0, "./mlnet")
 
-from neuron.adaline import Adaline
-from neuron.perceptron import Perceptron
+from mlnet.adaline import Adaline
+from mlnet.perceptron import Perceptron
 
 # ! This GUI evolves frome the one implemented on the Perceptron project
 

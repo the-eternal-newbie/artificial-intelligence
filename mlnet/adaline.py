@@ -1,6 +1,7 @@
 import numpy as np
 from perceptron import Perceptron
 
+
 # ! This class inherits from the Perceptron Class
 class Adaline(Perceptron):
     def __init__(self, **kwargs):
