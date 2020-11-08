@@ -1,9 +1,5 @@
 import numpy as np
-import sys
-sys.path.insert(
-    0, "./perceptron")
 from perceptron import Perceptron
-
 
 # ! This class inherits from the Perceptron Class
 class Adaline(Perceptron):
@@ -24,7 +20,6 @@ class Adaline(Perceptron):
         while((self.current_epoch <= self.epoch_limit)):
             current_sqre = 0
             self.current_epoch += 1
-            error_freq = 0
             for element in self.data:
                 error = element['expected'] - self.sigmoid(element['coord'])
                 current_sqre += (error * error)

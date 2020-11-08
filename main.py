@@ -1,6 +1,4 @@
 import sys
-sys.path.insert(
-    0, "./perceptron")
 import json
 import weakref
 import numpy as np
@@ -8,15 +6,18 @@ import tkinter as tk
 
 from os import path
 from os import execl
-from adaline import Adaline
 from tkinter import messagebox
-from perceptron import Perceptron
 from matplotlib.figure import Figure
 from matplotlib.ticker import MaxNLocator
 from matplotlib.backends.backend_tkagg import (
     FigureCanvasTkAgg, NavigationToolbar2Tk)
 from matplotlib.backend_bases import key_press_handler
 
+sys.path.insert(0, "./neuron")
+sys.path.insert(0, "./network")
+
+from neuron.adaline import Adaline
+from neuron.perceptron import Perceptron
 
 # ! This GUI evolves frome the one implemented on the Perceptron project
 

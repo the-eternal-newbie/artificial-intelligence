@@ -1,7 +1,9 @@
 {
-    "python.pythonPath": "env/bin/python",
+    "python.pythonPath": "/Users/carlosvp/dev/artificial-intelligence/env/bin/python3",
     "python.formatting.autopep8Args": [
         "--ignore",
         "E402"
-    ]
+    ],
+    "python.linting.enabled": true,
+    "python.linting.pylintEnabled": true
 }
