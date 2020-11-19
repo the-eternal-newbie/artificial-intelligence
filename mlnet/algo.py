@@ -1,8 +1,7 @@
 from .adaline import Adaline
 
 def bp_forward(neuron: Adaline):
-    neuron.process()
-    return neuron.sigmoid(neuron.net_value(), net=True)
+    return neuron.process()
     
 def bp_backward(neuron: Adaline):
     print('bp backward')

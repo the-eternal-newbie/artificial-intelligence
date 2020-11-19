@@ -23,7 +23,6 @@ class Network(object):
         for _ in range(kwargs.get('hidden_layers', 1)):
             layer = Layer(**{
                 'algo': kwargs.get('algo', 'backprop'),
-                'data_set': self.data,
                 'eta': self.eta,
                 'epoch_limit': self.epoch_limit,
                 'sqre': self.sqre,
@@ -34,7 +33,6 @@ class Network(object):
         self.layers.append(Layer(**{
             'type': 'output',
             'algo': kwargs.get('algo', 'backprop'),
-            'data_set': self.data,
             'eta': self.eta,
             'epoch_limit': self.epoch_limit,
             'sqre': self.sqre,
@@ -42,5 +40,8 @@ class Network(object):
         }))
 
     def learn(self):
+        output = self.data
         for layer in self.layers:
-            layer.process()
+            layer.process(output)
+            output = layer.output
+        print(output)

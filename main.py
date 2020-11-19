@@ -70,47 +70,47 @@ class Layout(object):
         ix, iy = event.xdata, event.ydata
         if(ix != None):
             if(self.perceptron_trained and event.button == 3):
-                point = {'coord': None, 'class': None, 'color': 'pink'}
-                point['coord'] = [-1, round(ix, 2), round(iy, 2)]
+                point = {'data': None, 'class': None, 'color': 'pink'}
+                point['data'] = [-1, round(ix, 2), round(iy, 2)]
                 point['class'] = 0
-                if(np.dot(self.perceptron_weights, np.array(point['coord'])) >= 0):
+                if(np.dot(self.perceptron_weights, np.array(point['data'])) >= 0):
                     point['class'] = 1
                     point['color'] = 'green'
 
-                self.ax.scatter(point['coord'][1],
-                                point['coord'][2], color=point['color'])
+                self.ax.scatter(point['data'][1],
+                                point['data'][2], color=point['color'])
                 self.ax.annotate('Class {}'.format(
-                    point['class']), (point['coord'][1] + .5, point['coord'][2]))
+                    point['class']), (point['data'][1] + .5, point['data'][2]))
                 self.canvas.draw()  # Refreshes the canvas
 
             elif(self.adaline_trained and event.button == 1):
-                point = {'coord': None, 'class': None, 'color': 'gray'}
-                point['coord'] = [-1, round(ix, 2), round(iy, 2)]
+                point = {'data': None, 'class': None, 'color': 'gray'}
+                point['data'] = [-1, round(ix, 2), round(iy, 2)]
                 point['class'] = 1
-                y = np.dot(self.adaline_weights, np.array(point['coord']))
+                y = np.dot(self.adaline_weights, np.array(point['data']))
                 activation = 1 / (1 + np.exp(-y))
                 if(activation <= 0.5):
                     point['class'] = 0
                     point['color'] = 'yellow'
 
-                self.ax.scatter(point['coord'][1],
-                                point['coord'][2], color=point['color'])
+                self.ax.scatter(point['data'][1],
+                                point['data'][2], color=point['color'])
                 self.ax.annotate('Class {}'.format(
-                    point['class']), (point['coord'][1] + .5, point['coord'][2]))
+                    point['class']), (point['data'][1] + .5, point['data'][2]))
                 self.canvas.draw()  # Refreshes the canvas
             else:
-                point = {'coord': None, 'expected': None}
+                point = {'data': None, 'desired': None}
                 color = 'orange'
-                point['expected'] = 0
+                point['desired'] = 0
                 if(event.button == 3):
-                    point['expected'] = 1
+                    point['desired'] = 1
                     color = 'purple'
-                # The round operation on the coords is to prevent a slow convergence of the algorithm,
-                # the plot detects a very precise coord of almost 10 decimal places and it is harder for
+                # The round operation on the datas is to prevent a slow convergence of the algorithm,
+                # the plot detects a very precise data of almost 10 decimal places and it is harder for
                 # the algorithm to process those values
-                point['coord'] = [-1, round(ix, 2), round(iy, 2)]
-                self.ax.scatter(point['coord'][1],
-                                point['coord'][2], color=color)
+                point['data'] = [-1, round(ix, 2), round(iy, 2)]
+                self.ax.scatter(point['data'][1],
+                                point['data'][2], color=color)
                 self.canvas.draw()  # Refreshes the canvas
                 data_set.append(point)
 

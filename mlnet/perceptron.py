@@ -20,7 +20,7 @@ class Perceptron(object):
         if(kwargs.get('weights', None)):
             self.weights = np.array([kwargs.get('weights')])
         else:
-            self.weights = np.random.rand(1, 3)
+            self.weights = np.random.rand(1, len(self.data[0]['data']))
         self.lines = []
 
     #       Perceptron function Pω(x^j):
@@ -46,11 +46,11 @@ class Perceptron(object):
             error_freq = 0
             not_done = False
             for element in self.data:
-                error = element['expected'] - self.activation(element['coord'])
+                error = element['desired'] - self.activation(element['data'])
                 if(error != 0):
                     not_done = True
                     error_freq += 1
-                    self.adjust(error, element['coord'])
+                    self.adjust(error, element['data'])
                     self.lines.append(
                         [self.weights[0][0], self.weights[0][1], self.weights[0][2]])
             self.error_freq.append(error_freq)
